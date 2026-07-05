@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-sea-900: #0b2540;
+  --color-sea-800: #12395f;
+  --color-sea-700: #1b4d7e;
+  --color-sea-500: #2f80c2;
+  --color-foam: #eaf4fb;
+  --color-buoy-red: #e23b3b;
+  --color-buoy-green: #1faa59;
+  --color-amber: #f4a52a;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(180deg, var(--color-sea-900), var(--color-sea-800));
+  color: var(--color-foam);
+}
