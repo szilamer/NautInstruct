@@ -1,6 +1,6 @@
 // Tartalommodell (spec 9. pont): témakör → szabály → szituáció → hibatípus → magyarázatok.
 
-export type TopicId = 'jelzesek' | 'fenyek' | 'radiozas' | 'horgonyzas'
+export type TopicId = 'jelzesek' | 'fenyek' | 'radiozas' | 'horgonyzas' | 'navigacio'
 
 export type Environment = 'folyo' | 'tenger'
 export type TimeOfDay = 'nappal' | 'ejszaka'

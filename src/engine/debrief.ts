@@ -1,14 +1,17 @@
-import type { DiagnosisQuality, ErrorType, Rule, Situation } from '../content/types'
+import type { DiagnosisOption, DiagnosisQuality, ErrorType, Rule } from '../content/types'
 import { chatCompletionJson, type ChatMessage } from '../llm/client'
 import { hasApiKey, type LlmSettings } from '../llm/settings'
 
 export type ExplanationDepth = 'rovid' | 'kozepes' | 'reszletes'
 
 export interface SelfDiagnosisInput {
-  situation: Situation
+  /** A helyzet rövid leírása (szituáció promptja vagy küldetés-brief) az LLM kontextusához. */
+  context: string
+  /** Öndiagnózis-opciók az adott helyzethez. */
+  diagnosisOptions: DiagnosisOption[]
   rule: Rule
   errorType?: ErrorType
-  /** Opciós öndiagnózis (HD-02) – a hívó feloldja a minőséget a szituáció opcióiból. */
+  /** Opciós öndiagnózis (HD-02) – a hívó feloldja a minőséget az opciókból. */
   diagnosisOptionId?: string
   /** Szabad szöveges öndiagnózis (LLM módban). */
   freeText?: string
@@ -56,7 +59,7 @@ export function buildExplanation(rule: Rule, quality: DiagnosisQuality): string 
 /** Sablonos debrief – nem igényel API-kulcsot, offline is működik. */
 export class ScriptedDebrief implements DebriefEngine {
   async classify(input: SelfDiagnosisInput): Promise<DebriefResult> {
-    const option = input.situation.diagnosisOptions.find((o) => o.id === input.diagnosisOptionId)
+    const option = input.diagnosisOptions.find((o) => o.id === input.diagnosisOptionId)
     // Opció nélkül (pl. csak szabad szöveg, LLM nélkül) óvatosan a legmélyebb magyarázatot adjuk.
     const quality: DiagnosisQuality = option?.quality ?? 'teves'
     return {
@@ -91,10 +94,10 @@ export class LlmDebrief implements DebriefEngine {
   }
 
   buildMessages(input: SelfDiagnosisInput): ChatMessage[] {
-    const { rule, errorType, situation } = input
+    const { rule, errorType } = input
     const playerDiagnosis =
       input.freeText?.trim() ||
-      situation.diagnosisOptions.find((o) => o.id === input.diagnosisOptionId)?.label ||
+      input.diagnosisOptions.find((o) => o.id === input.diagnosisOptionId)?.label ||
       '(nem adott meg magyarázatot)'
 
     const system =
@@ -105,7 +108,7 @@ export class LlmDebrief implements DebriefEngine {
       'A "pontos" rövid megerősítés, a "reszben" célzott pontosítás, a "teves" lépésről lépésre újratanítás legyen.'
 
     const user = [
-      `Szituáció: ${situation.prompt}`,
+      `Szituáció: ${input.context}`,
       `A vizsgázandó szabály: ${rule.title} — ${rule.correctSummary}`,
       errorType ? `A tanuló tényleges hibája: ${errorType.label}` : '',
       `A tanuló öndiagnózisa: "${playerDiagnosis}"`,

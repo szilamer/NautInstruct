@@ -21,6 +21,11 @@ export const topics: Topic[] = [
     title: 'Horgonyzás és kikötés',
     description: 'Lánchossz, vízmélység, sodrás és kikötési irány szerinti biztonságos döntések.',
   },
+  {
+    id: 'navigacio',
+    title: 'Navigáció',
+    description: 'Hajóút-tartás, kitérés (COLREG), köd és korlátozott látás melletti hajózás.',
+  },
 ]
 
 export const topicById = new Map(topics.map((t) => [t.id, t]))

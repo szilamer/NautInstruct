@@ -10,11 +10,12 @@ import {
   loadProgress,
   recordAttempt,
   saveProgress,
+  type ErrorCard,
   type ProgressState,
 } from '../engine/progress'
 import { loadLlmSettings, saveLlmSettings, type LlmSettings } from '../llm/settings'
 
-export type Route = 'home' | 'modes' | 'play' | 'progress' | 'settings'
+export type Route = 'home' | 'modes' | 'play' | 'navplay' | 'progress' | 'settings'
 export type SessionMode = 'kuldetes' | 'szabad'
 export type PlayPhase = 'deciding' | 'success' | 'debrief' | 'complete'
 
@@ -37,13 +38,20 @@ interface StoreState {
   llmSettings: LlmSettings
   progress: ProgressState
   session?: Session
+  activeMissionId?: string
 
   navigate: (route: Route) => void
   updateLlmSettings: (settings: LlmSettings) => void
   resetProgress: () => void
+  recordNavOutcome: (args: {
+    topicId: TopicId
+    correct: boolean
+    card?: Omit<ErrorCard, 'id' | 'at'>
+  }) => void
 
   startLevel: (levelId: string) => void
   startFreePractice: (topicId: TopicId) => void
+  startMission: (missionId: string) => void
   currentSituation: () => Situation | undefined
 
   chooseDecision: (decisionId: string) => void
@@ -75,6 +83,17 @@ export const useStore = create<StoreState>((set, get) => ({
     saveProgress(cleared)
     set({ progress: cleared })
   },
+
+  recordNavOutcome: ({ topicId, correct, card }) => {
+    let progress = recordAttempt(get().progress, topicId, correct)
+    if (card) {
+      progress = addErrorCard(progress, { ...card, id: `${card.situationId}-${Date.now()}`, at: Date.now() })
+    }
+    saveProgress(progress)
+    set({ progress })
+  },
+
+  startMission: (missionId) => set({ route: 'navplay', activeMissionId: missionId }),
 
   startLevel: (levelId) => {
     const level = levelById.get(levelId)
@@ -183,7 +202,8 @@ export const useStore = create<StoreState>((set, get) => ({
     set({ session: { ...session, debriefLoading: true } })
     const engine = createDebriefEngine(state.llmSettings)
     const result = await engine.classify({
-      situation,
+      context: situation.prompt,
+      diagnosisOptions: situation.diagnosisOptions,
       rule: session.lastEval.rule,
       errorType: session.lastEval.errorType,
       diagnosisOptionId,

@@ -201,6 +201,63 @@ export const rules: Rule[] = [
       { id: 'e-kotel-kereszt', label: 'Úgy kötöttél ki, hogy a kötelek keresztezték a szomszéd hajóét.' },
     ],
   },
+  // --- Navigáció (küldetésekhez) ---
+  {
+    id: 'r-lateralis-jelek',
+    topicId: 'jelzesek',
+    title: 'Laterális (oldalsó) jelek',
+    correctSummary: 'A laterális bójákat a helyes oldalon kell elhagyni: a piros a bal, a zöld a jobb oldalt jelzi.',
+    explanations: {
+      rovid: 'Piros bóját balra, zöld bóját jobbra hagyd el – köztük halad a hajóút.',
+      kozepes:
+        'A laterális jelek a hajóút szélét jelzik. A bóják közötti sáv a biztonságos víz: a piros jeleket a bal, a zöld jeleket a jobb oldaladon tartva haladj. Ha rossz oldalon kerülöd meg, kimész a hajóútból.',
+      reszletes:
+        'A laterális (oldalsó) jelrendszer a hajóút két szélét jelöli. Menetirány szerint a hajóutat a piros és zöld bóják között tartsd: a piros jelek a bal, a zöld jelek a jobb oldalon maradjanak. Ha egy bóját a rossz oldalon hagysz el, a hajóúton kívülre, sekély vagy veszélyes vízre kerülhetsz. Ezért mindig a bóják közötti sávban, a megfelelő oldalon haladj el mellettük.',
+    },
+    typicalErrors: [{ id: 'e-buoy-rossz-oldal', label: 'A bóját a rossz oldalon hagytad el, kimentél a hajóútból.' }],
+  },
+  {
+    id: 'r-akadaly-kerules',
+    topicId: 'jelzesek',
+    title: 'Akadály és sekély víz kerülése',
+    correctSummary: 'A jelzett akadályt/zátonyt biztonságos távolságban kell kikerülni.',
+    explanations: {
+      rovid: 'Tartsd a hajóutat, kerüld el a zátonyt/akadályt.',
+      kozepes:
+        'A parti sáv, a zátony és a jelzett akadály veszélyes. Maradj a hajóútban, és tarts biztonságos távolságot az akadálytól, hogy ne feneklj meg és ne ütközz.',
+      reszletes:
+        'A hajózható tér korlátozott: a part menti sekélyek, zátonyok és jelzett akadályok megfeneklést vagy ütközést okozhatnak. A helyes döntés a hajóút tartása és az akadály biztonságos, kellő távolságú kikerülése – nem közvetlenül mellette elhaladva, mert a víz alatti kiterjedés nagyobb lehet a látszatnál.',
+    },
+    typicalErrors: [{ id: 'e-akadalynak', label: 'Nekimentél az akadálynak / kihajóztál a sekélyre.' }],
+  },
+  {
+    id: 'r-kod-sebesseg',
+    topicId: 'navigacio',
+    title: 'Sebesség ködben',
+    correctSummary: 'Ködben, korlátozott látásnál mérsékelt (biztonságos) sebességgel kell haladni.',
+    explanations: {
+      rovid: 'Ködben lassíts – csak akkora sebesség, amivel időben meg tudsz állni.',
+      kozepes:
+        'Korlátozott látásnál (köd) a biztonságos sebesség az, amellyel a látótávolságon belül meg tudsz állni. Túl gyorsan haladva nem tudsz időben reagálni egy hirtelen felbukkanó akadályra vagy hajóra.',
+      reszletes:
+        'Ködben és korlátozott látási viszonyok között a szabály a „biztonságos sebesség": olyan lassan haladj, hogy a rendelkezésre álló látótávolságon belül biztonságosan meg tudj állni. Emellett fokozott figyelem, hangjelzések használata és szükség esetén a radar segít. A túl nagy sebesség a leggyakoribb hiba – ütközéshez vagy megfeneklődéshez vezethet, mert nincs idő reagálni.',
+    },
+    typicalErrors: [{ id: 'e-kod-gyors', label: 'Ködben túl gyorsan haladtál, nem tudtál időben megállni.' }],
+  },
+  {
+    id: 'r-colreg-kiteres',
+    topicId: 'fenyek',
+    title: 'Kitérés szemből közeledő hajónál (COLREG)',
+    correctSummary: 'Szemből közeledő géphajók jobbra (starboard) térnek ki, és bal oldalukkal (port-to-port) haladnak el.',
+    explanations: {
+      rovid: 'Szemből jövő hajónál fordulj jobbra – bal oldalatokkal haladjatok el egymás mellett.',
+      kozepes:
+        'Ha két géphajó szemből közeledik (fejtől), mindkettőnek jobbra (starboard) kell kitérnie, hogy a bal oldalukkal (port-to-port) haladjanak el. Ha nem térsz ki, vagy rossz irányba fordulsz, ütközésveszély alakul ki.',
+      reszletes:
+        'A COLREG kitérési szabály szerint szemből közeledő (fejtől találkozó) géphajóknál mindkét hajó jobbra (starboard) tér ki, és a bal oldalukkal (port-to-port) haladnak el egymás mellett. Éjszaka ezt a fények is jelzik: ha szemből mindkét oldalfényt (piros és zöld) és az árbócfényt látod, fejtől közeledtek. Ilyenkor időben, határozottan fordulj jobbra. A balra fordulás vagy az irány tartása a leggyakoribb, veszélyes hiba.',
+    },
+    typicalErrors: [{ id: 'e-nem-teres', label: 'Nem tértél ki jobbra időben a szemből jövő hajó elől.' }],
+  },
 ]
 
 export const ruleById = new Map(rules.map((r) => [r.id, r]))

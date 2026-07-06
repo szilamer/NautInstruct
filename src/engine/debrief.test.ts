@@ -10,7 +10,8 @@ const rule = ruleById.get('r-kikotes-ar-ellen')!
 
 function inputWith(diagnosisOptionId?: string, freeText?: string): SelfDiagnosisInput {
   return {
-    situation,
+    context: situation.prompt,
+    diagnosisOptions: situation.diagnosisOptions,
     rule,
     errorType: rule.typicalErrors[0],
     diagnosisOptionId,

@@ -40,7 +40,7 @@ describe('progress', () => {
 
   it('minden témakör vizsgakész → vizsgakész kapitány', () => {
     let p = emptyProgress()
-    for (const t of ['jelzesek', 'fenyek', 'radiozas', 'horgonyzas'] as const) {
+    for (const t of Object.keys(p.topics) as (keyof typeof p.topics)[]) {
       p = recordAttempt(p, t, true)
       p = recordAttempt(p, t, true)
       p = recordAttempt(p, t, true)
