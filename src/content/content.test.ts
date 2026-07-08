@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { rules, ruleById } from './rules'
 import { situations } from './situations'
 import { missions } from '../nav/missions'
+import { chartTasks } from '../chart/charts'
 
 describe('tartalmi integritás — szituációk', () => {
   it('minden szituáció létező szabályra hivatkozik', () => {
@@ -64,6 +65,14 @@ describe('tartalmi integritás — szabályok és küldetések', () => {
         const pontos = v!.diagnosisOptions.filter((o) => o.quality === 'pontos').length
         expect(pontos, `${m.id} pontos opció`).toBe(1)
       }
+    }
+  })
+
+  it('minden térképi feladat létező szabályra mutat, egy pontos opcióval', () => {
+    for (const t of chartTasks) {
+      expect(ruleById.has(t.ruleId), `${t.id} → ${t.ruleId}`).toBe(true)
+      const pontos = t.diagnosisOptions.filter((o) => o.quality === 'pontos').length
+      expect(pontos, `${t.id} pontos opció`).toBe(1)
     }
   })
 })

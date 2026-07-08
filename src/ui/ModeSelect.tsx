@@ -6,6 +6,7 @@ import { useStore } from '../state/store'
 export function ModeSelect() {
   const startFreePractice = useStore((s) => s.startFreePractice)
   const startMission = useStore((s) => s.startMission)
+  const startChart = useStore((s) => s.startChart)
 
   // Csak azok a témák jelennek meg kvízként, amelyekhez van szituáció.
   const quizTopics = topics
@@ -39,6 +40,24 @@ export function ModeSelect() {
             </div>
           )
         })}
+      </div>
+
+      <h2 className="mt-10 text-2xl font-bold">Térképnavigáció</h2>
+      <p className="mt-1 text-foam/70">
+        Interaktív térkép: iránymérés (bearing), iránytartás a kikötőig és helymeghatározás
+        (pozíciófix) a mért iránylatok metszéspontjából.
+      </p>
+      <div className="mt-6">
+        <div className="rounded-2xl border border-sea-500/30 bg-sea-800/60 p-5 sm:max-w-md">
+          <div className="text-lg font-bold">Térképnavigációs feladatok</div>
+          <div className="mt-1 text-sm text-foam/70">Bearing, course és pozíciófix gyakorlatok.</div>
+          <button
+            onClick={startChart}
+            className="mt-4 rounded-lg bg-sea-500 px-4 py-2 text-sm font-semibold transition hover:bg-sea-500/90"
+          >
+            🧭 Térkép indítása
+          </button>
+        </div>
       </div>
 
       <h2 className="mt-10 text-2xl font-bold">Kvíz gyakorlás témakörönként</h2>

@@ -15,7 +15,7 @@ import {
 } from '../engine/progress'
 import { loadLlmSettings, saveLlmSettings, type LlmSettings } from '../llm/settings'
 
-export type Route = 'home' | 'modes' | 'play' | 'navplay' | 'progress' | 'settings'
+export type Route = 'home' | 'modes' | 'play' | 'navplay' | 'chart' | 'progress' | 'settings'
 export type SessionMode = 'kuldetes' | 'szabad'
 export type PlayPhase = 'deciding' | 'success' | 'debrief' | 'complete'
 
@@ -52,6 +52,7 @@ interface StoreState {
   startLevel: (levelId: string) => void
   startFreePractice: (topicId: TopicId) => void
   startMission: (missionId: string) => void
+  startChart: () => void
   currentSituation: () => Situation | undefined
 
   chooseDecision: (decisionId: string) => void
@@ -94,6 +95,8 @@ export const useStore = create<StoreState>((set, get) => ({
   },
 
   startMission: (missionId) => set({ route: 'navplay', activeMissionId: missionId }),
+
+  startChart: () => set({ route: 'chart' }),
 
   startLevel: (levelId) => {
     const level = levelById.get(levelId)
