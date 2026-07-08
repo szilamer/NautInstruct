@@ -42,22 +42,25 @@ export function NavPlay({ mission }: { mission: NavMission }) {
   const vinfo = violation ? mission.violations[violation.kind] : undefined
   const rule = vinfo ? ruleById.get(vinfo.ruleId) : undefined
 
-  // Billentyűzet-vezérlés.
+  // Tap-alapú vezérlés: a gáz tartósan beáll (cirkáló sebesség), a kormány koppintásra fordít.
+  const nudge = (d: number) => {
+    boat.current.heading += d
+  }
+  const changeThrottle = (d: number) => {
+    input.current.throttle = Math.max(0, Math.min(1, input.current.throttle + d))
+  }
+
   useEffect(() => {
-    const set = (e: KeyboardEvent, down: boolean) => {
-      if (e.key === 'ArrowUp' || e.key === 'w') input.current.throttle = down ? 1 : 0
-      if (e.key === 'ArrowDown' || e.key === 's') input.current.throttle = down ? 0 : input.current.throttle
-      if (e.key === 'ArrowLeft' || e.key === 'a') input.current.turn = down ? -1 : 0
-      if (e.key === 'ArrowRight' || e.key === 'd') input.current.turn = down ? 1 : 0
+    const kd = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowUp' || e.key === 'w') changeThrottle(0.34)
+      else if (e.key === 'ArrowDown' || e.key === 's') changeThrottle(-0.34)
+      else if (e.key === 'ArrowLeft' || e.key === 'a') nudge(-0.22)
+      else if (e.key === 'ArrowRight' || e.key === 'd') nudge(0.22)
+      else return
+      e.preventDefault()
     }
-    const kd = (e: KeyboardEvent) => set(e, true)
-    const ku = (e: KeyboardEvent) => set(e, false)
     window.addEventListener('keydown', kd)
-    window.addEventListener('keyup', ku)
-    return () => {
-      window.removeEventListener('keydown', kd)
-      window.removeEventListener('keyup', ku)
-    }
+    return () => window.removeEventListener('keydown', kd)
   }, [])
 
   // HUD sebesség frissítése.
@@ -154,7 +157,12 @@ export function NavPlay({ mission }: { mission: NavMission }) {
         <div className="pointer-events-none absolute right-3 top-3 rounded bg-black/50 px-2 py-1 text-xs">
           Sebesség: {hudSpeed.toFixed(1)}
         </div>
-        <TouchControls input={input} />
+        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2 select-none">
+          <Ctrl onClick={() => nudge(-0.22)}>◀ balra</Ctrl>
+          <Ctrl onClick={() => changeThrottle(0.34)}>▲ gyorsít</Ctrl>
+          <Ctrl onClick={() => changeThrottle(-0.34)}>▼ lassít</Ctrl>
+          <Ctrl onClick={() => nudge(0.22)}>jobbra ▶</Ctrl>
+        </div>
       </div>
 
       <div className="flex h-1/2 flex-col overflow-y-auto border-t border-white/10 bg-sea-800/60 p-5 lg:h-full lg:w-[400px] lg:border-l lg:border-t-0">
@@ -166,7 +174,8 @@ export function NavPlay({ mission }: { mission: NavMission }) {
         <p className="mt-2 text-sm text-foam/80">{mission.brief}</p>
 
         <div className="mt-4 rounded-lg bg-sea-900/60 p-3 text-xs text-foam/70">
-          <b>Irányítás:</b> nyilak vagy W/A/S/D — előre gyorsít, balra/jobbra kormányoz. Cél: a zöld gyűrű.
+          <b>Irányítás:</b> a <b>gyorsít/lassít</b> gombokkal állítod a sebességet (tartósan cirkál), a{' '}
+          <b>balra/jobbra</b> gombokkal (vagy a nyilakkal) kormányozol. Cél: a zöld gyűrű.
         </div>
 
         {phase === 'anchor' && (
@@ -238,25 +247,11 @@ function ScopeButton({ onClick, children }: { onClick: () => void; children: Rea
   )
 }
 
-function TouchControls({ input }: { input: React.MutableRefObject<BoatInput> }) {
-  const press = (patch: Partial<BoatInput>) => () => Object.assign(input.current, patch)
-  return (
-    <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2 select-none">
-      <Ctrl onDown={press({ turn: -1 })} onUp={press({ turn: 0 })}>◀</Ctrl>
-      <Ctrl onDown={press({ throttle: 1 })} onUp={press({ throttle: 0 })}>▲ gáz</Ctrl>
-      <Ctrl onDown={press({ turn: 1 })} onUp={press({ turn: 0 })}>▶</Ctrl>
-    </div>
-  )
-}
-
-function Ctrl({ onDown, onUp, children }: { onDown: () => void; onUp: () => void; children: React.ReactNode }) {
+function Ctrl({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
   return (
     <button
-      onPointerDown={onDown}
-      onPointerUp={onUp}
-      onPointerLeave={onUp}
-      onPointerCancel={onUp}
-      className="rounded-lg bg-black/50 px-4 py-3 text-sm font-bold text-white active:bg-sea-500"
+      onClick={onClick}
+      className="rounded-lg bg-black/55 px-4 py-3 text-sm font-bold text-white transition hover:bg-sea-500 active:bg-sea-500"
     >
       {children}
     </button>

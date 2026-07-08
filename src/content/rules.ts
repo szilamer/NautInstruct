@@ -1,7 +1,8 @@
 import type { Rule } from './types'
+import { extraRules } from './rulesExtra'
 
 // A szabályok a Sidro Nautika ICC tananyagból (docs/forras-tananyag) származnak.
-export const rules: Rule[] = [
+const coreRules: Rule[] = [
   // --- Jelzések ---
   {
     id: 'r-kikotes-ar-ellen',
@@ -260,4 +261,5 @@ export const rules: Rule[] = [
   },
 ]
 
+export const rules: Rule[] = [...coreRules, ...extraRules]
 export const ruleById = new Map(rules.map((r) => [r.id, r]))

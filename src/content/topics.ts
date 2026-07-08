@@ -24,7 +24,17 @@ export const topics: Topic[] = [
   {
     id: 'navigacio',
     title: 'Navigáció',
-    description: 'Hajóút-tartás, kitérés (COLREG), köd és korlátozott látás melletti hajózás.',
+    description: 'Hajóút-tartás, kitérés (COLREG), köd, térkép- és iránymeghatározás, világítótornyok.',
+  },
+  {
+    id: 'csomok',
+    title: 'Csomók',
+    description: 'A leggyakoribb hajós csomók felismerése és helyes használata.',
+  },
+  {
+    id: 'egyeb',
+    title: 'Egyéb ismeretek',
+    description: 'Tűzosztályok, szelek, apály-dagály, hajótípusok, felszerelés és további vizsgatételek.',
   },
 ]
 
