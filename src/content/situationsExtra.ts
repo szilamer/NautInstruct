@@ -561,8 +561,287 @@ const navigacioSituations: Situation[] = [
   },
 ]
 
+// Semleges jelenet a szöveges (tudás) kérdésekhez.
+const plain = (label?: string) => ({
+  environment: 'tenger' as const,
+  timeOfDay: 'nappal' as const,
+  visibility: 'tiszta' as const,
+  objects: [
+    { kind: 'boat' as const, x: 0, z: 0.35 },
+    ...(label ? [{ kind: 'sign' as const, x: -0.35, z: 0.7, label }] : []),
+  ],
+})
+
+// ---------------------------------------------------------------------------
+// RÁDIÓZÁS
+// ---------------------------------------------------------------------------
+const radiozasSituations: Situation[] = [
+  {
+    id: 's-radio-csatorna',
+    ruleId: 'r-radio-csatorna',
+    topicId: 'radiozas',
+    prompt: 'Melyik VHF csatorna a nemzetközi vész- és hívócsatorna?',
+    scene: plain('16'),
+    decisions: [
+      { id: 'd1', label: 'A 16-os csatorna.', isCorrect: true },
+      { id: 'd2', label: 'A 6-os csatorna.', isCorrect: false, errorTypeId: 'e-radio-csatorna' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'A 16-os a nemzetközi vész- és hívócsatorna.', quality: 'pontos' },
+      { id: 'g2', label: 'Nem emlékeztem a pontos csatornaszámra.', quality: 'reszben' },
+      { id: 'g3', label: 'Bármelyik csatornán le lehet adni a vészhívást.', quality: 'teves' },
+    ],
+  },
+  {
+    id: 's-radio-mayday-felepites',
+    ruleId: 'r-radio-mayday-felepites',
+    topicId: 'radiozas',
+    prompt: 'Hogyan épül fel helyesen egy Mayday vészhívás?',
+    scene: plain('MAYDAY'),
+    decisions: [
+      { id: 'd1', label: 'Mayday×3, hajó neve, pozíció, a veszély jellege, kért segítség, „Over".', isCorrect: true },
+      { id: 'd2', label: 'Elég egyszer bemondani a segélykérést, részletek nélkül.', isCorrect: false, errorTypeId: 'e-radio-felepites' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'A vészüzenetnek strukturáltnak kell lennie (név, pozíció, veszély, segítség).', quality: 'pontos' },
+      { id: 'g2', label: 'Kihagytam néhány elemet az üzenetből.', quality: 'reszben' },
+      { id: 'g3', label: 'A pozíciót nem kell bemondani.', quality: 'teves' },
+    ],
+  },
+  {
+    id: 's-radio-dsc',
+    ruleId: 'r-radio-dsc',
+    topicId: 'radiozas',
+    prompt: 'Mi a DSC (szelektív hívás) szerepe?',
+    scene: plain('DSC'),
+    decisions: [
+      { id: 'd1', label: 'Egy gombnyomással automatikus, digitális segélyhívás (azonosítóval, pozícióval).', isCorrect: true },
+      { id: 'd2', label: 'A hajó zenelejátszó rendszere.', isCorrect: false, errorTypeId: 'e-radio-dsc' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'A DSC automatikus digitális vészhívás, a GMDSS része.', quality: 'pontos' },
+      { id: 'g2', label: 'Nem tudtam pontosan, mit csinál a DSC.', quality: 'reszben' },
+      { id: 'g3', label: 'A DSC csak rutin beszélgetésre való.', quality: 'teves' },
+    ],
+  },
+  {
+    id: 's-radio-veszjel',
+    ruleId: 'r-radio-veszjelzes',
+    topicId: 'radiozas',
+    prompt: 'Az alábbiak közül melyik NEMZETKÖZI vészjelzés?',
+    scene: plain('SOS'),
+    decisions: [
+      { id: 'd1', label: 'Narancssárga füstjel / vörös csillagszóró rakéta / a két kar lassú fel-le mozgatása.', isCorrect: true },
+      { id: 'd2', label: 'Zöld zászló lengetése.', isCorrect: false, errorTypeId: 'e-radio-veszjel' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'A narancssárga füst / vörös rakéta / karok fel-le vészjelzés; a zöld zászló nem az.', quality: 'pontos' },
+      { id: 'g2', label: 'Nem voltam biztos, melyik a hivatalos vészjelzés.', quality: 'reszben' },
+      { id: 'g3', label: 'Bármilyen színű jelzés vészjelzésnek számít.', quality: 'teves' },
+    ],
+  },
+]
+
+// ---------------------------------------------------------------------------
+// HORGONYZÁS
+// ---------------------------------------------------------------------------
+const horgonyzasSituations: Situation[] = [
+  {
+    id: 's-apaly-dagaly',
+    ruleId: 'r-apaly-dagaly',
+    topicId: 'horgonyzas',
+    prompt: 'Tengeren horgonyoznál, ahol jelentős az apály-dagály. Mivel számolsz a lánchossznál?',
+    scene: plain(),
+    decisions: [
+      { id: 'd1', label: 'A várható MAXIMÁLIS vízmélységgel (dagálykor), ahhoz méretezem a láncot.', isCorrect: true },
+      { id: 'd2', label: 'A pillanatnyi (apálykori) mélységgel, az elég.', isCorrect: false, errorTypeId: 'e-apaly' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'Dagálykor nő a mélység, ezért a maximumhoz kell méretezni a láncot.', quality: 'pontos' },
+      { id: 'g2', label: 'Nem gondoltam a vízszint változására.', quality: 'reszben' },
+      { id: 'g3', label: 'Az apály-dagály nem befolyásolja a horgonyzást.', quality: 'teves' },
+    ],
+  },
+]
+
+// ---------------------------------------------------------------------------
+// CSOMÓK
+// ---------------------------------------------------------------------------
+const csomokSituations: Situation[] = [
+  {
+    id: 's-csomo-palstek',
+    ruleId: 'r-csomo-palstek',
+    topicId: 'csomok',
+    prompt: 'Rögzített méretű, nem csúszó hurokra van szükséged egy cölöp/bak köré. Melyik csomót kötöd?',
+    scene: plain('⛓'),
+    decisions: [
+      { id: 'd1', label: 'Palstek (nem csúszó, fix hurok).', isCorrect: true },
+      { id: 'd2', label: 'Csúszó hurok.', isCorrect: false, errorTypeId: 'e-csomo-palstek' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'Fix, nem csúszó hurokhoz a palstek a helyes.', quality: 'pontos' },
+      { id: 'g2', label: 'Nem tudtam, melyik csomó nem csúszik.', quality: 'reszben' },
+      { id: 'g3', label: 'Bármelyik csomó jó rögzített hurokhoz.', quality: 'teves' },
+    ],
+  },
+  {
+    id: 's-csomo-nyolcas',
+    ruleId: 'r-csomo-szoritonyolcas',
+    topicId: 'csomok',
+    prompt: 'Meg akarod akadályozni, hogy a kötél vége kicsússzon egy csigából. Melyik csomó a jó?',
+    scene: plain('8'),
+    decisions: [
+      { id: 'd1', label: 'Szorító nyolcas (stopper) a kötél végén.', isCorrect: true },
+      { id: 'd2', label: 'Palstek a kötél végén.', isCorrect: false, errorTypeId: 'e-csomo-nyolcas' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'A kötélvég kicsúszása ellen a nyolcas (stopper) csomó való.', quality: 'pontos' },
+      { id: 'g2', label: 'Összekevertem a stoppert a hurokkal.', quality: 'reszben' },
+      { id: 'g3', label: 'A kötélvéget nem kell stopperrel ellátni.', quality: 'teves' },
+    ],
+  },
+  {
+    id: 's-csomo-takacs',
+    ruleId: 'r-csomo-takacs',
+    topicId: 'csomok',
+    prompt: 'Két különböző vastagságú kötelet kell összekötnöd. Melyik csomót választod?',
+    scene: plain('⇄'),
+    decisions: [
+      { id: 'd1', label: 'Takácscsomó (eltérő vastagságnál is biztonságos).', isCorrect: true },
+      { id: 'd2', label: 'Egyszerű (lapos) csomó.', isCorrect: false, errorTypeId: 'e-csomo-takacs' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'Eltérő vastagságú kötelekhez a takácscsomó biztonságos, a lapos csúszhat.', quality: 'pontos' },
+      { id: 'g2', label: 'Nem tudtam, melyik csomó bír el eltérő vastagságot.', quality: 'reszben' },
+      { id: 'g3', label: 'Kötelek toldásához bármelyik csomó jó.', quality: 'teves' },
+    ],
+  },
+]
+
+// ---------------------------------------------------------------------------
+// EGYÉB (tűz, szelek, hajótípus, legénység, felszerelés, fkm)
+// ---------------------------------------------------------------------------
+const egyebSituations: Situation[] = [
+  {
+    id: 's-tuz-benzin',
+    ruleId: 'r-tuz-osztalyok',
+    topicId: 'egyeb',
+    prompt: 'A fedélzeten benzin gyulladt meg. Melyik tűzosztályba tartozik?',
+    scene: plain('🔥B'),
+    decisions: [
+      { id: 'd1', label: 'B osztály (folyékony éghető anyag).', isCorrect: true },
+      { id: 'd2', label: 'A osztály (szilárd anyag).', isCorrect: false, errorTypeId: 'e-tuz-osztaly' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'A benzin folyékony, ezért B osztályú tűz.', quality: 'pontos' },
+      { id: 'g2', label: 'Bizonytalan voltam a B és A osztály között.', quality: 'reszben' },
+      { id: 'g3', label: 'A tűzosztály nem befolyásolja az oltást.', quality: 'teves' },
+    ],
+  },
+  {
+    id: 's-tuz-feltetel',
+    ruleId: 'r-tuz-feltetel',
+    topicId: 'egyeb',
+    prompt: 'Egy kis tüzet szeretnél eloltani. Melyik feltétel megszüntetése a leggyorsabb (fojtás)?',
+    scene: plain('🔥'),
+    decisions: [
+      { id: 'd1', label: 'Az oxigén elzárása (pl. takaróval/habbal fojtás).', isCorrect: true },
+      { id: 'd2', label: 'Több éghető anyag hozzáadása.', isCorrect: false, errorTypeId: 'e-tuz-feltetel' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'A tűzháromszög egyik elemét (itt az oxigént) kell megszüntetni.', quality: 'pontos' },
+      { id: 'g2', label: 'Nem voltam biztos az oltás elvében.', quality: 'reszben' },
+      { id: 'g3', label: 'A tüzet nem lehet fojtással oltani.', quality: 'teves' },
+    ],
+  },
+  {
+    id: 's-szel-bura',
+    ruleId: 'r-szelek',
+    topicId: 'egyeb',
+    prompt: 'Az Adrián hideg, száraz, erősen széllökéses északkeleti szél fúj. Melyik ez?',
+    scene: plain('ÉK'),
+    decisions: [
+      { id: 'd1', label: 'Bura (Bora).', isCorrect: true },
+      { id: 'd2', label: 'Sirokkó (Yugo).', isCorrect: false, errorTypeId: 'e-szel' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'A hideg, lökéses ÉK-i szél a Bura; a Sirokkó meleg és DK-i.', quality: 'pontos' },
+      { id: 'g2', label: 'Összekevertem a Burát a Sirokkóval.', quality: 'reszben' },
+      { id: 'g3', label: 'A szél iránya nem számít.', quality: 'teves' },
+    ],
+  },
+  {
+    id: 's-hajotipus-katamaran',
+    ruleId: 'r-hajotipusok',
+    topicId: 'egyeb',
+    prompt: 'Egy két, párhuzamos törzzsel épített hajó típusa?',
+    scene: plain(),
+    decisions: [
+      { id: 'd1', label: 'Katamarán.', isCorrect: true },
+      { id: 'd2', label: 'Trimarán.', isCorrect: false, errorTypeId: 'e-hajotipus' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'Két törzs = katamarán (három törzs = trimarán).', quality: 'pontos' },
+      { id: 'g2', label: 'Összekevertem a törzsek számát.', quality: 'reszben' },
+      { id: 'g3', label: 'A törzsek száma nem határozza meg a típust.', quality: 'teves' },
+    ],
+  },
+  {
+    id: 's-legenyseg-kozcelu',
+    ruleId: 'r-legenyseg',
+    topicId: 'egyeb',
+    prompt: 'Hány fő a kötelező legénység egy közcélú hajón?',
+    scene: plain('2'),
+    decisions: [
+      { id: 'd1', label: '2 fő (biztonsági feladatok miatt).', isCorrect: true },
+      { id: 'd2', label: '1 fő.', isCorrect: false, errorTypeId: 'e-legenyseg' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'Közcélú hajón 2 fő kell; a rekreációs/gazdasági 1 fő.', quality: 'pontos' },
+      { id: 'g2', label: 'Nem emlékeztem a közcélú hajó létszámára.', quality: 'reszben' },
+      { id: 'g3', label: 'Minden hajón 1 fő elég.', quality: 'teves' },
+    ],
+  },
+  {
+    id: 's-felszereles-horgony',
+    ruleId: 'r-felszereles',
+    topicId: 'egyeb',
+    prompt: 'Az alapfelszerelés szerint hány horgony ajánlott a fedélzeten?',
+    scene: plain('⚓2'),
+    decisions: [
+      { id: 'd1', label: '2 db horgony (megbízhatóság, tartalék).', isCorrect: true },
+      { id: 'd2', label: 'Elég 1 db.', isCorrect: false, errorTypeId: 'e-felszereles' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'Az alapfelszerelés 2 db horgonyt tartalmaz.', quality: 'pontos' },
+      { id: 'g2', label: 'Nem tudtam pontosan a darabszámot.', quality: 'reszben' },
+      { id: 'g3', label: 'A horgonyok száma nem lényeges.', quality: 'teves' },
+    ],
+  },
+  {
+    id: 's-fkm',
+    ruleId: 'r-fkm',
+    topicId: 'egyeb',
+    prompt: 'Mit jelent a folyamkilométer (fkm) a parti táblákon?',
+    scene: plain('fkm'),
+    decisions: [
+      { id: 'd1', label: 'A pont távolsága a torkolattól (a Rajnán a forrástól).', isCorrect: true },
+      { id: 'd2', label: 'A megengedett sebesség km/h-ban.', isCorrect: false, errorTypeId: 'e-fkm' },
+    ],
+    diagnosisOptions: [
+      { id: 'g1', label: 'Az fkm a torkolattól mért távolság, tájékozódásra/helymegadásra.', quality: 'pontos' },
+      { id: 'g2', label: 'Nem tudtam pontosan, mihez képest mérik.', quality: 'reszben' },
+      { id: 'g3', label: 'Az fkm a sebességhatár.', quality: 'teves' },
+    ],
+  },
+]
+
 export const extraSituations: Situation[] = [
   ...fenyekSituations,
   ...jelzesekSituations,
   ...navigacioSituations,
+  ...radiozasSituations,
+  ...horgonyzasSituations,
+  ...csomokSituations,
+  ...egyebSituations,
 ]

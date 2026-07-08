@@ -405,4 +405,228 @@ const navigacioRules: Rule[] = [
   },
 ]
 
-export const extraRules: Rule[] = [...fenyekRules, ...jelzesekRules, ...navigacioRules]
+// ---------------------------------------------------------------------------
+// RÁDIÓZÁS — vészjelzések, hívásfelépítés, csatorna, DSC
+// ---------------------------------------------------------------------------
+const radiozasRules: Rule[] = [
+  {
+    id: 'r-radio-csatorna',
+    topicId: 'radiozas',
+    title: 'A 16-os VHF csatorna',
+    correctSummary: 'A 16-os VHF csatorna a nemzetközi vész- és hívócsatorna.',
+    explanations: {
+      rovid: '16-os csatorna = nemzetközi vész- és hívócsatorna.',
+      kozepes: 'A VHF 16-os csatorna a nemzetközi vész-, sürgősségi és hívócsatorna. Itt adják le a Mayday/Pan-pan/Sécurité hívásokat és itt lehet más állomást hívni, majd munkacsatornára váltani.',
+      reszletes: 'A 16-os csatornát folyamatosan figyelni kell hajózás közben. Ez a vész-, sürgősségi és hívócsatorna: vészhelyzetben (Mayday), sürgősségben (Pan-pan) és biztonsági közleménynél (Sécurité) is ezen kezdeményezünk. Rutin beszélgetésre hívás után munkacsatornára kell váltani, hogy a 16-os szabad maradjon a vészforgalomnak.',
+    },
+    typicalErrors: [{ id: 'e-radio-csatorna', label: 'Nem a 16-os vészcsatornát használtad.' }],
+  },
+  {
+    id: 'r-radio-mayday-felepites',
+    topicId: 'radiozas',
+    title: 'Mayday üzenet felépítése',
+    correctSummary: 'Mayday×3, a hajó neve, pozíció, a veszély jellege, a kért segítség, végül „Over".',
+    explanations: {
+      rovid: 'Mayday×3 → hajó neve → pozíció → veszély → kért segítség → Over.',
+      kozepes: 'A vészhívás felépítése: „Mayday, Mayday, Mayday", a hajó neve (3×), a pozíció, a veszély jellege, a szükséges segítség, majd „Over". Mindent érthetően, szükség esetén megismételve.',
+      reszletes: 'A strukturált Mayday célja, hogy a mentők azonnal tudják, ki, hol és milyen bajban van. Sorrend: jelszó „Mayday" háromszor; a hajó neve/hívójele; a pozíció (koordináta vagy tájékozódási pont); a veszély jellege (pl. süllyed, tűz, ember a vízben); a kért segítség; a fedélzeten lévők száma és egyéb fontos infó; végül „Over". Csak a hajóparancsnok engedélyezheti.',
+    },
+    typicalErrors: [{ id: 'e-radio-felepites', label: 'Hiányos/rossz sorrendű volt a vészüzenet felépítése.' }],
+  },
+  {
+    id: 'r-radio-dsc',
+    topicId: 'radiozas',
+    title: 'DSC szelektív hívás',
+    correctSummary: 'A DSC egy rádiómodem: egy gombnyomással automatikus, digitális vész-/segélyhívás küldhető.',
+    explanations: {
+      rovid: 'DSC = egy gombnyomásos automatikus digitális segélyhívás.',
+      kozepes: 'A szelektív hívás (DSC) olyan rádiómodem, amellyel egy gombnyomással automatikus, digitális segélyhívást lehet leadni (hajóazonosítóval, pozícióval). A GMDSS rendszer része.',
+      reszletes: 'A DSC (Digital Selective Calling) digitálisan, automatikusan továbbítja a hajó azonosítóját (MMSI) és – GPS-hez kötve – a pozícióját a vész gombbal. Ez felgyorsítja a segélykérést és biztosítja, hogy a parti állomás/más hajók azonnal megkapják az alapadatokat, majd a hangkommunikáció a 16-os csatornán folytatódik.',
+    },
+    typicalErrors: [{ id: 'e-radio-dsc', label: 'Nem ismerted fel a DSC szelektív hívás szerepét.' }],
+  },
+  {
+    id: 'r-radio-veszjelzes',
+    topicId: 'radiozas',
+    title: 'Vészjelzések felismerése',
+    correctSummary: 'Vészjelzés pl. a vörös csillagszóró rakéta, a narancssárga füst, az EPIRB és a lassan fel-le mozgatott karok.',
+    explanations: {
+      rovid: 'Vörös rakéta / narancssárga füst / EPIRB / karok fel-le = vészjelzés.',
+      kozepes: 'Számos jelzés használható veszély jelzésére vagy segítségkérésre, pl.: ágyúlövés percenként, vörös csillagszóró rakéta, SOS morze, Mayday, GMDSS/VHF, narancssárga füstjel, vörös kézi fáklya, a két kar lassú fel-le mozgatása, EPIRB.',
+      reszletes: 'A vészjelzések együtt vagy külön is használhatók. Fontosabbak: percenkénti ágyúlövés/robbanás; folyamatos kódjelzés; vörös csillagszóró rakéta/röppentyű; SOS morze; „Mayday" rádión; GMDSS/VHF automatikus segélykérés; „NC" kódjelzés; négyszögletű lobogó alatta/fölötte gömbbel; lángjelek; vörös fáklya; narancssárga füstjel; a két kar lassú, ismételt fel-le mozgatása; EPIRB rádióbója. Ezek felismerése és helyes leadása életet menthet.',
+    },
+    typicalErrors: [{ id: 'e-radio-veszjel', label: 'Nem ismerted fel a jelzést vészjelzésként.' }],
+  },
+]
+
+// ---------------------------------------------------------------------------
+// HORGONYZÁS — apály-dagály (a lánchossz/tilalom/kötél a coreRules-ban)
+// ---------------------------------------------------------------------------
+const horgonyzasRules: Rule[] = [
+  {
+    id: 'r-apaly-dagaly',
+    topicId: 'horgonyzas',
+    title: 'Apály-dagály',
+    correctSummary: 'A vízszint kb. 12 óránként váltakozik (apály-dagály); a Hold helyzete és vonzása okozza.',
+    explanations: {
+      rovid: 'Apály-dagály ~12 óránként; a Hold okozza – horgonyzáskor a maximális mélységgel számolj.',
+      kozepes: 'Az apály-dagály kb. 12 óránként váltakozik, és a Hold helyzetétől, vonzásától függ, amely a tenger vízszintjének mozgását okozza. Horgonyzáskor és a szabad magasságnál is figyelembe kell venni.',
+      reszletes: 'A dagály és apály a Hold (és Nap) tömegvonzása miatt kb. 12 óránként váltja egymást. A vízmélység így időben változik: horgonyzáskor a lánchosszt a várható maximális mélységhez kell méretezni, a szabad magasságnál pedig a legmagasabb vízálláshoz. Ennek elmulasztása megfeneklést vagy elszabadulást okozhat.',
+    },
+    typicalErrors: [{ id: 'e-apaly', label: 'Nem vetted figyelembe az apály-dagály vízszintváltozását.' }],
+  },
+]
+
+// ---------------------------------------------------------------------------
+// CSOMÓK
+// ---------------------------------------------------------------------------
+const csomokRules: Rule[] = [
+  {
+    id: 'r-csomo-palstek',
+    topicId: 'csomok',
+    title: 'Palstek (kikötőhurok)',
+    correctSummary: 'A palstek nem csúszó, rögzített hurkot ad – kikötéshez, mentéshez ideális.',
+    explanations: {
+      rovid: 'Palstek = nem csúszó, fix hurok (bak/cölöp köré, mentéshez).',
+      kozepes: 'A palstek egy rögzített méretű, nem csúszó hurkot képez a kötél végén. Terhelés alatt sem szorul össze és utána is könnyen bontható, ezért kikötéshez (bak, cölöp) és mentéshez ideális.',
+      reszletes: 'A palstek (bowline) a hajózás egyik legfontosabb csomója: fix, nem csúszó hurkot ad, amely nagy terhelés után is könnyen kibontható. Használható kikötéshez (a hurkot a bakra/cölöpre vetve), kötelek végén fülként, vagy mentésnél a vízben lévő köré. Csúszó hurok helyett mindig ezt válaszd, ahol rögzített méret kell.',
+    },
+    typicalErrors: [{ id: 'e-csomo-palstek', label: 'Rossz (pl. csúszó) csomót választottál rögzített hurok helyett.' }],
+  },
+  {
+    id: 'r-csomo-szoritonyolcas',
+    topicId: 'csomok',
+    title: 'Szorító nyolcas (stopper)',
+    correctSummary: 'A nyolcas csomó a kötél végén megakadályozza, hogy az kicsússzon egy csigán/lyukon.',
+    explanations: {
+      rovid: 'Nyolcas csomó = stopper a kötél végén, hogy ne csússzon ki.',
+      kozepes: 'A szorító (nyolcas) csomót a kötél végére kötik stopperként, hogy a kötél ne csússzon ki egy csigából, gyűrűből vagy vezetőn. Könnyen bontható, nem szorul be annyira, mint az egyszerű csomó.',
+      reszletes: 'A nyolcas csomó a végstopper klasszikus megoldása: megakadályozza, hogy a kötél vége átfusson egy csigán vagy vezetőlyukon (pl. vitorlaköteleknél). Előnye az egyszerű csomóval szemben, hogy terhelés után is könnyen kibontható. Ott használd, ahol a kötél véletlen kicsúszását kell megakadályozni.',
+    },
+    typicalErrors: [{ id: 'e-csomo-nyolcas', label: 'Nem stopper csomót használtál a kötél kicsúszása ellen.' }],
+  },
+  {
+    id: 'r-csomo-takacs',
+    topicId: 'csomok',
+    title: 'Takácscsomó (kötelek összekötése)',
+    correctSummary: 'A takácscsomó két – akár különböző vastagságú – kötél biztonságos összekötésére való.',
+    explanations: {
+      rovid: 'Takácscsomó = két kötél (eltérő vastagságú is) összekötése.',
+      kozepes: 'A takácscsomóval két kötelet lehet összekötni, akár különböző vastagságúakat is. Biztonságosabb erre a célra, mint az egyszerű (lapos) csomó, amely eltérő vastagságnál könnyen kicsúszik.',
+      reszletes: 'Két kötél toldásához a takácscsomó (sheet bend) a helyes választás, különösen ha a kötelek vastagsága eltér: a vékonyabbat vezetjük át és köré a vastagabb hurkán. Az egyszerű/lapos csomó eltérő vastagságnál vagy sima kötélnél megcsúszhat, ezért toldásra nem megbízható.',
+    },
+    typicalErrors: [{ id: 'e-csomo-takacs', label: 'Kötelek összekötésére nem a megfelelő csomót választottad.' }],
+  },
+  {
+    id: 'r-csomo-felcsomo',
+    topicId: 'csomok',
+    title: 'Félcsomó / rögzítő csomó',
+    correctSummary: 'A félcsomó (és ismételve a rögzítő) gyors ideiglenes rögzítésre jó, de önmagában nem megbízható.',
+    explanations: {
+      rovid: 'Félcsomó = gyors, ideiglenes rögzítés; tartós terheléshez kiegészítés kell.',
+      kozepes: 'A félcsomó a legegyszerűbb csomó, több csomó része. Gyors, ideiglenes rögzítésre alkalmas, de önmagában kicsúszhat vagy beszorulhat, ezért tartós terheléshez másik csomóval (pl. két félcsomó, rögzítő) egészítik ki.',
+      reszletes: 'A félcsomó számos összetett csomó alapeleme. Önmagában csak ideiglenes rögzítésre jó: terhelés alatt beszorulhat és nehezen bontható, vagy sima kötélnél kicsúszik. Megbízható rögzítéshez két félcsomót (kikötőbakra) vagy más, célnak megfelelő csomót használj.',
+    },
+    typicalErrors: [{ id: 'e-csomo-felcsomo', label: 'Tartós rögzítéshez csak félcsomót használtál.' }],
+  },
+]
+
+// ---------------------------------------------------------------------------
+// EGYÉB — tűz, szelek, hajótípusok/anyagok, legénység, felszerelés, fkm, papírok
+// ---------------------------------------------------------------------------
+const egyebRules: Rule[] = [
+  {
+    id: 'r-tuz-osztalyok',
+    topicId: 'egyeb',
+    title: 'Tűzosztályok (A–F)',
+    correctSummary: 'A tüzeket az égő anyag alapján 6 osztályba sorolják: A szilárd, B folyékony, C gáz, D fém, E elektromos, F konyhai (étolaj).',
+    explanations: {
+      rovid: 'A: szilárd, B: folyékony, C: gáz, D: fém, E: elektromos, F: étolaj/konyhai.',
+      kozepes: 'A tüzeket az égő anyag szerint osztályozzák, ami segít a megfelelő oltóanyag választásában: A (szilárd: fa, papír), B (folyékony: benzin, olaj), C (gáz: LPG, CNG, propán), D (fém), E (elektromos berendezések), F (konyhai/étolaj).',
+      reszletes: 'A helyes oltás az égő anyagtól függ, ezért fontos az osztály felismerése: A – szilárd anyagok (fa, szövet, papír); B – folyékony anyagok (benzin, gázolaj, olaj, festék); C – gáznemű (LPG, CNG, propán); D – fémek (magnézium, titán, alumínium); E – feszültség alatti elektromos berendezések; F – konyhai/étolaj tüzek. Rossz oltóanyag (pl. víz olaj- vagy elektromos tűzre) súlyosbíthatja a tüzet.',
+    },
+    typicalErrors: [{ id: 'e-tuz-osztaly', label: 'Rosszul azonosítottad a tűzosztályt / oltóanyagot.' }],
+  },
+  {
+    id: 'r-tuz-feltetel',
+    topicId: 'egyeb',
+    title: 'A tűz keletkezésének feltételei',
+    correctSummary: 'Tűzhöz három dolog kell együtt: éghető anyag, oxigén és megfelelő hőmérséklet (gyújtóforrás/szikra).',
+    explanations: {
+      rovid: 'Éghető anyag + oxigén + hő (szikra) = tűz; bármelyik hiánya megszünteti.',
+      kozepes: 'A tűz keletkezéséhez egyszerre kell éghető anyag, oxigén és megfelelő hőmérséklet vagy szikra. Az oltás lényege, hogy legalább az egyiket megszüntetjük (pl. az oxigént elzárjuk, vagy hűtünk).',
+      reszletes: 'A „tűzháromszög": éghető anyag, oxigén és gyújtóforrás (hő/szikra). Ha bármelyik hiányzik, nincs égés. Az oltási módszerek is ezen alapulnak: hűtés (hő elvonása, pl. víz szilárd tűzre), fojtás (oxigén elzárása, pl. hab/takaró), vagy az éghető anyag eltávolítása/elzárása (pl. gázcsap elzárása).',
+    },
+    typicalErrors: [{ id: 'e-tuz-feltetel', label: 'Nem ismerted fel a tűz feltételeit / az oltás elvét.' }],
+  },
+  {
+    id: 'r-szelek',
+    topicId: 'egyeb',
+    title: 'Adriai szelek',
+    correctSummary: 'A Bura (ÉK, hideg, széllökéses) és a Yugo/Sirokkó (DK, meleg, párás) a két meghatározó adriai szél; a Maestral kellemes nappali szél.',
+    explanations: {
+      rovid: 'Bura = hideg, lökéses ÉK-i; Yugo/Sirokkó = meleg, párás DK-i; Maestral = kellemes nappali NyÉ-i.',
+      kozepes: 'A meghatározó adriai szelek: Bura (északkeleti, hideg, erős és széllökéses, tiszta idő), Yugo/Sirokkó (délkeleti, meleg, párás, hullámos), Maestral (északnyugati, szép idő nappali szele). Ezek ismerete a tervezéshez és a biztonságos hajózáshoz kell.',
+      reszletes: 'Az Adrián a Bura (Bora) hideg, száraz, erősen lökéses ÉK-i szél, hirtelen erősödhet, veszélyes. A Yugo (Sirokkó) meleg, párás DK-i szél, tartós hullámzással. A Maestral kellemes, NyÉ-i nappali szél, vitorlázásra ideális. A Nevere hirtelen nyári viharszél, a Garbin (Lebicada) viharos DNy-i szél. A szél iránya, ereje és a légnyomás-változás előrejelzi a várható időt.',
+    },
+    typicalErrors: [{ id: 'e-szel', label: 'Rosszul azonosítottad a szelet / jellemzőit.' }],
+  },
+  {
+    id: 'r-hajotipusok',
+    topicId: 'egyeb',
+    title: 'Hajótípusok és anyagok',
+    correctSummary: 'Típusok: vitorlás, katamarán, motoros jacht, motorcsónak, halász-, teher-, utasszállító stb.; anyagok: üvegszálas műanyag, fa, alumínium, acél, kompozit, gumi.',
+    explanations: {
+      rovid: 'Sokféle hajótípus és építőanyag (üvegszálas, fa, alu, acél, kompozit, gumi).',
+      kozepes: 'Hajótípusok pl.: vitorlás, katamarán, trimarán, motoros jacht, motorcsónak, halászhajó, teherszállító, utasszállító. Építőanyagok: üvegszálas műanyag, fa, alumínium, acél, ötvözetek, kompozit, gumi.',
+      reszletes: 'A hajótípus a hajtás és a rendeltetés szerint különbözik (vitorlás, katamarán, trimarán, motoros jacht, motorcsónak, halász-, teher- és utasszállító, parasailing, banánhajó). Az építőanyag befolyásolja a tömeget, tartósságot és karbantartást: üvegszálas műanyag (elterjedt, könnyű), fa (hagyományos), alumínium és acél (erős), kompozit (könnyű, merev), gumi (felfújható).',
+    },
+    typicalErrors: [{ id: 'e-hajotipus', label: 'Rosszul azonosítottad a hajótípust/anyagot.' }],
+  },
+  {
+    id: 'r-legenyseg',
+    topicId: 'egyeb',
+    title: 'Legénység létszáma',
+    correctSummary: 'Rekreációs hajó 1 fő, közcélú hajó 2 fő (biztonsági feladatok miatt), gazdasági célú hajó 1 fő.',
+    explanations: {
+      rovid: 'Rekreációs 1 fő, közcélú 2 fő, gazdasági 1 fő.',
+      kozepes: 'A kötelező legénységi létszám a hajó céljától függ: rekreációs (hobbi) hajó 1 fő, közcélú (pl. mentés, ellenőrzés) hajó 2 fő biztonsági okból, gazdasági célú hajó 1 fő.',
+      reszletes: 'A minimális legénység a tevékenységhez igazodik: hobbihajón 1 fő elegendő; a közcélú (kapitánysági, hatósági, mentő) hajón 2 fő kell a biztonsági feladatok ellátásához; gazdasági célú (munka-) hajón 1 fő. Ez a felelős, biztonságos üzemeltetést hivatott biztosítani.',
+    },
+    typicalErrors: [{ id: 'e-legenyseg', label: 'Rosszul adtad meg a kötelező legénységi létszámot.' }],
+  },
+  {
+    id: 'r-felszereles',
+    topicId: 'egyeb',
+    title: 'Hajó kötelező felszerelése',
+    correctSummary: 'Alapfelszerelés: evező, 5 db kötél, 2 db horgony, csáklya, javítófelszerelés, szerszámok, fenékpumpa, merőedény, bika.',
+    explanations: {
+      rovid: 'Evező, 5 kötél, 2 horgony, csáklya, fenékpumpa, merőedény, bika, szerszámok.',
+      kozepes: 'A hajó javasolt/kötelező alapfelszerelése: evező, 5 db kötél, 2 db horgony, csáklya, javítófelszerelés, szerszámok, hajófenék-pumpa, merőedény és bika (kikötőbak).',
+      reszletes: 'A biztonságos üzemeltetéshez a fedélzeten legyen: evező (meghajtás kiesésére), 5 db kötél (kikötés, vontatás), 2 db horgony (megbízható rögzítés, tartalék), csáklya (manőverezés, tárgy elérése), javítófelszerelés és szerszámok, hajófenék-pumpa és merőedény (víztelenítés), valamint bika/kikötőbak a kötelek rögzítéséhez.',
+    },
+    typicalErrors: [{ id: 'e-felszereles', label: 'Hiányos volt a kötelező felszerelés ismerete.' }],
+  },
+  {
+    id: 'r-fkm',
+    topicId: 'egyeb',
+    title: 'Folyamkilométer (fkm)',
+    correctSummary: 'A folyamkilométer a víziút adott pontjának távolsága a folyó/csatorna torkolatától (a Rajnán a forrástól).',
+    explanations: {
+      rovid: 'fkm = távolság a torkolattól (a Rajnán a forrástól), a parti táblák jelzik.',
+      kozepes: 'A folyamkilométer a víziút adott pontjának távolsága a folyó vagy csatorna torkolatától (kivéve a Rajnát, ahol a forrástól számítják). A parton lévő táblák jelzik, tájékozódásra és helymegadásra szolgál.',
+      reszletes: 'Az fkm egységes helymegadó rendszer a folyón: megmutatja, hány kilométerre vagy a torkolattól (a Rajnán a forrástól). A parti kilométertáblák alapján pontosan meg tudod adni a helyzeted (pl. vészhívásnál, kikötő megtalálásához), és a hajózási térképek is ezt használják.',
+    },
+    typicalErrors: [{ id: 'e-fkm', label: 'Rosszul értelmezted a folyamkilométert.' }],
+  },
+]
+
+export const extraRules: Rule[] = [
+  ...fenyekRules,
+  ...jelzesekRules,
+  ...navigacioRules,
+  ...radiozasRules,
+  ...horgonyzasRules,
+  ...csomokRules,
+  ...egyebRules,
+]
