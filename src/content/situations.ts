@@ -1,6 +1,7 @@
 import type { Situation } from './types'
+import { extraSituations } from './situationsExtra'
 
-export const situations: Situation[] = [
+const coreSituations: Situation[] = [
   // ---------- Jelzések ----------
   {
     id: 's-kikotes-ar-ellen',
@@ -373,4 +374,5 @@ export const situations: Situation[] = [
   },
 ]
 
+export const situations: Situation[] = [...coreSituations, ...extraSituations]
 export const situationById = new Map(situations.map((s) => [s.id, s]))

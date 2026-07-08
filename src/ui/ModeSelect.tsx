@@ -1,12 +1,16 @@
-import { levels } from '../content/levels'
-import { topicById } from '../content/topics'
+import { situations } from '../content/situations'
+import { topics, topicById } from '../content/topics'
 import { missions } from '../nav/missions'
 import { useStore } from '../state/store'
 
 export function ModeSelect() {
-  const startLevel = useStore((s) => s.startLevel)
   const startFreePractice = useStore((s) => s.startFreePractice)
   const startMission = useStore((s) => s.startMission)
+
+  // Csak azok a témák jelennek meg kvízként, amelyekhez van szituáció.
+  const quizTopics = topics
+    .map((t) => ({ topic: t, count: situations.filter((s) => s.topicId === t.id).length }))
+    .filter((x) => x.count > 0)
 
   return (
     <div className="mx-auto h-full max-w-4xl overflow-y-auto px-6 py-8">
@@ -37,34 +41,25 @@ export function ModeSelect() {
         })}
       </div>
 
-      <h2 className="mt-10 text-2xl font-bold">Kvíz gyakorlás</h2>
-      <p className="mt-1 text-foam/70">Gyors, döntésalapú gyakorlás témakörönként (pl. rádiózás).</p>
+      <h2 className="mt-10 text-2xl font-bold">Kvíz gyakorlás témakörönként</h2>
+      <p className="mt-1 text-foam/70">
+        Döntésalapú gyakorlás: fények, táblák, rádiózás, csomók és további vizsgatételek felismerése.
+      </p>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        {levels.map((level) => {
-          const topic = topicById.get(level.topicId)
-          return (
-            <div key={level.id} className="rounded-2xl border border-white/10 bg-sea-800/60 p-5">
-              <div className="text-lg font-bold">{level.title}</div>
-              <div className="text-sm text-foam/70">{level.subtitle}</div>
-              <div className="mt-2 text-xs text-foam/50">{topic?.description}</div>
-              <div className="mt-4 flex gap-2">
-                <button
-                  onClick={() => startLevel(level.id)}
-                  className="rounded-lg bg-sea-700 px-4 py-2 text-sm font-semibold transition hover:bg-sea-700/80"
-                >
-                  Kvíz indítása
-                </button>
-                <button
-                  onClick={() => startFreePractice(level.topicId)}
-                  className="rounded-lg border border-white/20 px-4 py-2 text-sm transition hover:bg-white/10"
-                >
-                  Szabad gyakorlás
-                </button>
-              </div>
-            </div>
-          )
-        })}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {quizTopics.map(({ topic, count }) => (
+          <div key={topic.id} className="rounded-2xl border border-white/10 bg-sea-800/60 p-5">
+            <div className="text-lg font-bold">{topicById.get(topic.id)?.title}</div>
+            <div className="mt-1 text-xs text-foam/60">{topic.description}</div>
+            <div className="mt-2 text-xs text-foam/50">{count} gyakorlat</div>
+            <button
+              onClick={() => startFreePractice(topic.id)}
+              className="mt-4 rounded-lg bg-sea-700 px-4 py-2 text-sm font-semibold transition hover:bg-sea-700/80"
+            >
+              Kvíz indítása
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   )
