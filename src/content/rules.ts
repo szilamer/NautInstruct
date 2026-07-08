@@ -206,14 +206,14 @@ const coreRules: Rule[] = [
   {
     id: 'r-lateralis-jelek',
     topicId: 'jelzesek',
-    title: 'Laterális (oldalsó) jelek',
-    correctSummary: 'A laterális bójákat a helyes oldalon kell elhagyni: a piros a bal, a zöld a jobb oldalt jelzi.',
+    title: 'Laterális (oldalsó) jelek — belvíz',
+    correctSummary: 'Belvízen a hajóút jobb oldalát piros, bal oldalát zöld bója jelzi (a folyásirány az irányadó); a bóják között a biztonságos víz.',
     explanations: {
-      rovid: 'Piros bóját balra, zöld bóját jobbra hagyd el – köztük halad a hajóút.',
+      rovid: 'Belvízen a hajóút jobb oldala piros, bal oldala zöld bója – köztük haladj.',
       kozepes:
-        'A laterális jelek a hajóút szélét jelzik. A bóják közötti sáv a biztonságos víz: a piros jeleket a bal, a zöld jeleket a jobb oldaladon tartva haladj. Ha rossz oldalon kerülöd meg, kimész a hajóútból.',
+        'A belvízi laterális jelek a hajóút szélét jelzik: a jobb oldalt piros, a bal oldalt zöld bója (a kitűzésnél mindig a folyó folyásiránya az irányadó). A bóják közötti sáv a biztonságos víz; a rossz oldalon elhaladva kimész a hajóútból.',
       reszletes:
-        'A laterális (oldalsó) jelrendszer a hajóút két szélét jelöli. Menetirány szerint a hajóutat a piros és zöld bóják között tartsd: a piros jelek a bal, a zöld jelek a jobb oldalon maradjanak. Ha egy bóját a rossz oldalon hagysz el, a hajóúton kívülre, sekély vagy veszélyes vízre kerülhetsz. Ezért mindig a bóják közötti sávban, a megfelelő oldalon haladj el mellettük.',
+        'Belvízen (folyón) a hajóút jobb oldalát piros, bal oldalát zöld bójával jelölik, és a bal/jobb meghatározásánál mindig a folyásirány az irányadó. A biztonságos víz a piros és zöld bóják között van. Ha egy bóját a rossz oldalon hagysz el, sekély vagy veszélyes vízre kerülhetsz. (Tengeren a laterális rendszer eltérő lehet – ott a térkép és a IALA-régió az irányadó.)',
     },
     typicalErrors: [{ id: 'e-buoy-rossz-oldal', label: 'A bóját a rossz oldalon hagytad el, kimentél a hajóútból.' }],
   },
