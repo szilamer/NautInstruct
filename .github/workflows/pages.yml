@@ -1,0 +1,45 @@
+# NautInstruct közzététele GitHub Pages-en a `gh-pages` ág frissítésével.
+# Nem igényel szervert, SSH-t vagy külön secretet (a beépített GITHUB_TOKEN elég).
+# Egyszeri teendő: a repó Settings → Pages alatt a Source = "Deploy from a branch",
+# Branch = gh-pages / (root).
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, cursor/naut-instruct-materials-and-spec-aef0]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build (GitHub Pages base path)
+        run: npm run build
+        env:
+          BASE_PATH: /NautInstruct/
+      - name: SPA fallback + Jekyll kikapcsolása
+        run: |
+          cp dist/index.html dist/404.html
+          touch dist/.nojekyll
+      - name: Publish to gh-pages branch
+        run: |
+          cd dist
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -qm "deploy: ${{ github.sha }}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:gh-pages

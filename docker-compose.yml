@@ -1,0 +1,11 @@
+# NautInstruct – önálló, statikus frontend konténer.
+# Külön projektnév ("nautinstruct"), külön port (8090) – nem ütközik a VPS meglévő
+# szolgáltatásaival (MissionControll: 3000 backend, 5433 postgres, 8080 frontend).
+services:
+  web:
+    build: .
+    image: nautinstruct:latest
+    container_name: nautinstruct
+    restart: unless-stopped
+    ports:
+      - "8090:80"

@@ -1,0 +1,76 @@
+# NautInstruct — CI (build) + CD (rsync + Docker a Hetzner VPS-re)
+# Szükséges GitHub repo secrets a deployhoz:
+#   VPS_HOST     – a szerver IP-je vagy hosztneve (pl. 23.88.58.202)
+#   VPS_SSH_KEY  – root SSH privát kulcs (ugyanaz, amit a MissionControll deploy is használ)
+name: NautInstruct CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: nautinstruct-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: CI — lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  deploy:
+    name: CD — rsync + Docker (VPS)
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SSH setup
+        run: |
+          set -e
+          HOST="${{ secrets.VPS_HOST }}"
+          KEY="${{ secrets.VPS_SSH_KEY }}"
+          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+            echo "Hiányzó secret: állítsd be a VPS_HOST és VPS_SSH_KEY repo secreteket."
+            exit 1
+          fi
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          echo "$KEY" > ~/.ssh/key
+          chmod 600 ~/.ssh/key
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Rsync forrás a VPS-re
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/key -o StrictHostKeyChecking=no" \
+            --exclude node_modules --exclude dist --exclude .git --exclude '*.tsbuildinfo' \
+            ./ "root@${VPS_HOST}:/root/nautinstruct/"
+
+      - name: Távoli build + indítás + health
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          ssh -i ~/.ssh/key -o StrictHostKeyChecking=no "root@${VPS_HOST}" '
+            set -e
+            cd /root/nautinstruct
+            docker compose up -d --build
+            sleep 3
+            curl -sf -o /dev/null -w "NautInstruct HTTP %{http_code}\n" http://127.0.0.1:8090/
+          '
